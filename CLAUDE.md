@@ -83,10 +83,11 @@ En place :
 - environnement Docker de développement, avec rechargement automatique du code
 - ruff, pre-commit, pytest, un test sur la route de santé
 - workflow de CI
+- CORS pour le front Vue
+
 
 Pas encore fait :
 
 - authentification de l'API (jetons ou JWT pour le front et le mobile)
-- CORS pour le front Vue
 - réglages et image de production (serveur WSGI, fichiers statiques, HTTPS)
 - modèles et routes métier
