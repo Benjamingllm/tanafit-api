@@ -1,0 +1,33 @@
+# Secrets et configuration locale
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+
+# Outils
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Django
+*.log
+db.sqlite3
+/staticfiles/
+/media/
+
+# Docker
+docker-compose.override.yml
+
+# IDE et OS
+.vscode/
+.idea/
+.claude/settings.local.json
+*.swp
+.DS_Store
+Thumbs.db
