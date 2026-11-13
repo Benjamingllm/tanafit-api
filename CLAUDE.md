@@ -44,7 +44,7 @@ uv run python -m pre_commit run --all-files   # pas `pre-commit` : le lanceur .e
 
 - `config/` : `settings.py`, `urls.py`, points d'entrée WSGI et ASGI
 - `apps/core/` : routes techniques, dont `/api/health/`
-- `apps/users/` : modèle `User` personnalisé (`AUTH_USER_MODEL = "users.User"`)
+- `apps/users/` : modèle `User` personnalisé, identifié par son e-mail (`AUTH_USER_MODEL = "users.User"`)
 - `apps/<app>/tests/` : tests de chaque application, fichiers `test_*.py`
 - `docs/` : notes techniques
 
@@ -79,15 +79,15 @@ Mise en place terminée, aucune fonctionnalité métier.
 En place :
 
 - squelette Django avec la route `GET /api/health/`, qui répond `{"status": "ok"}`
-- modèle `User` vide, hérité de `AbstractUser`, et sa migration initiale
+- modèle `User` identifié par son adresse e-mail, sans `username`, avec son manager (`User.objects.create_user(email=..., password=...)`) et son écran d'admin
 - environnement Docker de développement, avec rechargement automatique du code
-- ruff, pre-commit, pytest, un test sur la route de santé
+- ruff, pre-commit, pytest, avec des tests sur la route de santé, le CORS et le modèle `User`
 - workflow de CI
 - CORS pour le front Vue
 
 
 Pas encore fait :
 
-- authentification de l'API (jetons ou JWT pour le front et le mobile)
+- authentification de l'API par JWT : routes de connexion, de rafraîchissement du jeton, d'inscription et de profil
 - réglages et image de production (serveur WSGI, fichiers statiques, HTTPS)
 - modèles et routes métier
