@@ -5,6 +5,7 @@ Backend de Tanafit, une application de suivi de musculation. L'API servira un fr
 ## Stack
 
 - Python 3.13, Django 5.2 LTS, Django REST Framework
+- djangorestframework-simplejwt pour l'authentification par JWT
 - PostgreSQL 17, pilote psycopg 3
 - Docker Compose : services `web` (Django) et `db` (PostgreSQL)
 - uv pour les dépendances (`pyproject.toml`, `uv.lock`)
@@ -44,7 +45,7 @@ uv run python -m pre_commit run --all-files   # pas `pre-commit` : le lanceur .e
 
 - `config/` : `settings.py`, `urls.py`, points d'entrée WSGI et ASGI
 - `apps/core/` : routes techniques, dont `/api/health/`
-- `apps/users/` : modèle `User` personnalisé, identifié par son e-mail (`AUTH_USER_MODEL = "users.User"`)
+- `apps/users/` : modèle `User` personnalisé, identifié par son e-mail (`AUTH_USER_MODEL = "users.User"`), et routes d'authentification sous `/api/auth/`
 - `apps/<app>/tests/` : tests de chaque application, fichiers `test_*.py`
 - `docs/` : notes techniques
 
@@ -54,6 +55,7 @@ uv run python -m pre_commit run --all-files   # pas `pre-commit` : le lanceur .e
 
 - Une nouvelle application va dans `apps/`, avec `name = "apps.<nom>"` dans son `apps.py`, et s'ajoute à `INSTALLED_APPS`.
 - Les routes de l'API sont sous le préfixe `/api/`.
+- Toute route exige un jeton d'accès par défaut (`IsAuthenticated`). Une route publique le déclare explicitement avec `AllowAny`, comme `/api/health/`.
 - Aucun secret dans le code : tout réglage sensible ou propre à un environnement est lu avec django-environ dans `config/settings.py`, et documenté dans `.env.example`.
 - `DEBUG` vaut `False` par défaut. `SECRET_KEY` et `DATABASE_URL` n'ont pas de valeur de repli.
 - ruff : lignes de 100 caractères, règles `E`, `F`, `I`, `UP`, `B`, `DJ`. Les migrations sont exclues.
@@ -81,13 +83,14 @@ En place :
 - squelette Django avec la route `GET /api/health/`, qui répond `{"status": "ok"}`
 - modèle `User` identifié par son adresse e-mail, sans `username`, avec son manager (`User.objects.create_user(email=..., password=...)`) et son écran d'admin
 - environnement Docker de développement, avec rechargement automatique du code
-- ruff, pre-commit, pytest, avec des tests sur la route de santé, le CORS et le modèle `User`
+- connexion par JWT : `POST /api/auth/login/` (e-mail et mot de passe, insensible à la casse de l'e-mail) renvoie un jeton d'accès de 15 minutes et un jeton de rafraîchissement de 30 jours ; `POST /api/auth/refresh/` renouvelle les deux
+- ruff, pre-commit, pytest, avec des tests sur la route de santé, le CORS, le modèle `User` et la connexion
 - workflow de CI
 - CORS pour le front Vue
 
 
 Pas encore fait :
 
-- authentification de l'API par JWT : routes de connexion, de rafraîchissement du jeton, d'inscription et de profil
+- routes d'inscription et de profil
 - réglages et image de production (serveur WSGI, fichiers statiques, HTTPS)
 - modèles et routes métier
