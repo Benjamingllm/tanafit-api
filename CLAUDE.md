@@ -84,13 +84,15 @@ En place :
 - modèle `User` identifié par son adresse e-mail, sans `username`, avec son manager (`User.objects.create_user(email=..., password=...)`) et son écran d'admin
 - environnement Docker de développement, avec rechargement automatique du code
 - connexion par JWT : `POST /api/auth/login/` (e-mail et mot de passe, insensible à la casse de l'e-mail) renvoie un jeton d'accès de 15 minutes et un jeton de rafraîchissement de 30 jours ; `POST /api/auth/refresh/` renouvelle les deux
-- ruff, pre-commit, pytest, avec des tests sur la route de santé, le CORS, le modèle `User` et la connexion
+- inscription : `POST /api/auth/register/` (publique) crée un compte à partir d'un e-mail et d'un mot de passe, refuse un e-mail déjà pris quelle que soit la casse et un mot de passe rejeté par `AUTH_PASSWORD_VALIDATORS`, et renvoie le compte créé, sans jetons
+- profil : `GET /api/auth/me/` renvoie le compte connecté (`id`, `email`, `first_name`, `last_name`)
+- sérialiseurs dans `apps/users/serializers.py` : `UserSerializer` pour exposer un compte, `RegisterSerializer` pour l'inscription
+- ruff, pre-commit, pytest, avec des tests sur la route de santé, le CORS, le modèle `User`, la connexion, l'inscription et le profil
 - workflow de CI
 - CORS pour le front Vue
 
 
 Pas encore fait :
 
-- routes d'inscription et de profil
 - réglages et image de production (serveur WSGI, fichiers statiques, HTTPS)
 - modèles et routes métier
