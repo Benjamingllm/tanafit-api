@@ -114,6 +114,18 @@ Les migrations sont aussi appliquées automatiquement à chaque démarrage.
 | Mettre en forme | `uv run ruff format .` |
 | Lancer tous les hooks | `uv run python -m pre_commit run --all-files` |
 
+### Image de production
+
+`docker compose` construit la cible `dev` du Dockerfile. La cible `prod`, construite par défaut, copie le code dans l'image, collecte les fichiers statiques et lance gunicorn.
+
+| Action | Commande |
+|---|---|
+| Construire l'image de production | `docker build -t tanafit-api:prod .` |
+| La lancer sur la base locale, port 8001 | `docker run --rm -p 8001:8000 --env-file .env -e DEBUG=False --network tanafit-api_default tanafit-api:prod` |
+| Vérifier les réglages de production | `docker compose exec -e DEBUG=False -e HTTPS=True web python manage.py check --deploy` |
+
+`check --deploy` signale `security.W021` (HSTS preload) : c'est voulu, l'inscription sur la liste de preload des navigateurs est quasi irréversible.
+
 ### Ménage
 
 `docker system prune` supprime les images et le cache de build inutilisés, qui s'accumulent avec le temps.
@@ -145,7 +157,9 @@ tanafit-api/
 
 Les tests de chaque application sont dans son dossier `tests/`.
 
-Tous les réglages sensibles sont lus dans les variables d'environnement. `DEBUG` vaut `False` si la variable est absente, et l'application refuse de démarrer sans `SECRET_KEY` ni `DATABASE_URL`.
+Tous les réglages sensibles sont lus dans les variables d'environnement. Si la variable est absente, `DEBUG` vaut `False` et `HTTPS` vaut `True`, et l'application refuse de démarrer sans `SECRET_KEY` ni `DATABASE_URL`.
+
+`HTTPS` active la redirection vers HTTPS, l'en-tête HSTS et les cookies sécurisés. Le certificat, lui, est géré par le proxy de l'hébergeur, qui transmet les requêtes à gunicorn en HTTP. En développement et en CI, `HTTPS` vaut `False`.
 
 ## Branches et commits
 

@@ -8,7 +8,9 @@ dependencies = [
     "django-environ>=0.14.0",
     "djangorestframework>=3.18.3",
     "djangorestframework-simplejwt>=5.5.1",
+    "gunicorn>=27.0.1",
     "psycopg[binary]>=3.3.9",
+    "whitenoise>=6.12.0",
 ]
 
 [dependency-groups]
@@ -33,3 +35,5 @@ select = ["E", "F", "I", "UP", "B", "DJ"]
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings"
 python_files = ["test_*.py"]
+# whitenoise signale l'absence de staticfiles/ : collectstatic ne tourne que dans l'image de production.
+filterwarnings = ["ignore:No directory at:UserWarning"]
