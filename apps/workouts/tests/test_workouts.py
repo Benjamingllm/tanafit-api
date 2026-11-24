@@ -35,13 +35,13 @@ def create_workout(user, name="Push"):
 
 @pytest.mark.django_db
 def test_workouts_requires_token(client):
-    response = client.get(reverse("workouts-get"))
+    response = client.get(reverse("workouts_get"))
 
     assert response.status_code == 401
 
 
 def test_workouts_returns_empty_list_without_workouts(client, alice):
-    response = client.get(reverse("workouts-get"), headers=auth(alice))
+    response = client.get(reverse("workouts_get"), headers=auth(alice))
 
     assert response.status_code == 200
     assert response.json() == []
@@ -51,7 +51,7 @@ def test_workouts_returns_only_own_workouts(client, alice, bob):
     create_workout(alice, name="Push")
     create_workout(bob, name="Pull")
 
-    response = client.get(reverse("workouts-get"), headers=auth(alice))
+    response = client.get(reverse("workouts_get"), headers=auth(alice))
 
     assert response.status_code == 200
     assert [workout["name"] for workout in response.json()] == ["Push"]
@@ -65,7 +65,7 @@ def test_workout_includes_its_sets(client, alice, bench_press):
         reps=8, wheight=60.0, charge_index=2, is_warmup=False, exercise=bench_press, workout=push
     )
 
-    response = client.get(reverse("workouts-get"), headers=auth(alice))
+    response = client.get(reverse("workouts_get"), headers=auth(alice))
 
     workouts = {workout["name"]: workout for workout in response.json()}
     assert sorted(s["reps"] for s in workouts["Push"]["sets"]) == [8, 10]
@@ -87,3 +87,44 @@ def test_models_display_their_name(alice, bench_press):
     assert str(template) == "Haut du corps"
     assert str(template_exercise) == "Développé couché"
     assert str(create_workout(alice, name="Push")) == "Push"
+
+
+def patch_workout(client, user, workout, data):
+    return client.patch(
+        reverse("workouts_update", args=[workout.pk]),
+        data=data,
+        content_type="application/json",
+        headers=auth(user),
+    )
+
+
+def test_update_changes_own_workout(client, alice):
+    workout = create_workout(alice, name="Push")
+
+    response = patch_workout(client, alice, workout, {"name": "Push lourd"})
+
+    assert response.status_code == 200
+    assert response.json()["name"] == "Push lourd"
+    workout.refresh_from_db()
+    assert workout.name == "Push lourd"
+    assert workout.activate is True
+
+
+def test_update_refuses_other_user_workout(client, alice, bob):
+    workout = create_workout(bob, name="Pull")
+
+    response = patch_workout(client, alice, workout, {"name": "Piraté"})
+
+    assert response.status_code == 404
+    workout.refresh_from_db()
+    assert workout.name == "Pull"
+
+
+def test_update_cannot_change_owner(client, alice, bob):
+    workout = create_workout(alice)
+
+    response = patch_workout(client, alice, workout, {"user_id": bob.pk})
+
+    assert response.status_code == 200
+    workout.refresh_from_db()
+    assert workout.user_id == alice
