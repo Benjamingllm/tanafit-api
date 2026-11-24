@@ -6,14 +6,14 @@ from apps.users.models import User
 
 
 class MuscleGroup(models.Model):
-    name = models.CharField("name")
+    name = models.CharField("name", default="MuscleGroup")
 
     def __str__(self):
         return self.name
 
 
 class Exercise(models.Model):
-    name = models.CharField("name")
+    name = models.CharField("name", default="exercise")
     muscle_group = models.ForeignKey(MuscleGroup, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -21,7 +21,7 @@ class Exercise(models.Model):
 
 
 class Template(models.Model):
-    name = models.CharField("name")
+    name = models.CharField("name", default="template")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -33,6 +33,7 @@ class Workout(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     template = models.ForeignKey(Template, null=True, blank=True, on_delete=models.CASCADE)
     activate = models.BooleanField("activated")
+    name = models.CharField("name", default="workout")
 
     def __str__(self):
         return self.name
@@ -46,7 +47,7 @@ class TemplateExercise(models.Model):
     max_rep_amount = models.IntegerField("max_rep_amount")
 
     def __str__(self):
-        return self.name
+        return self.exercise.name
 
 
 class Set(models.Model):
@@ -55,7 +56,7 @@ class Set(models.Model):
     is_warmup = models.BooleanField("is_warmup", default=True)
     charge_index = models.IntegerField("wharge_index")
     exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE)
-    workout = models.ForeignKey(Workout, on_delete=models.CASCADE)
+    workout = models.ForeignKey(Workout, on_delete=models.CASCADE, related_name="sets")
 
     def __str__(self):
-        return self.name
+        return super().__str__()
