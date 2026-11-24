@@ -22,6 +22,15 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractUser):
+    class IndiceCharge(models.TextChoices):
+        RIR = "RIR", "RIR"
+        RPE = "RPE", "RPE"
+
+    indice_charge = models.CharField(
+        max_length=3,
+        choices=IndiceCharge.choices,
+        default=IndiceCharge.RIR,
+    )
     username = None
     email = models.EmailField("adresse e-mail", unique=True)
     USERNAME_FIELD = "email"
