@@ -24,7 +24,7 @@ class WorkoutSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Workout
-        exclude = ["user_id"]
+        exclude = ["user"]
 
     def create(self, data):
         sets = data.pop("sets", [])

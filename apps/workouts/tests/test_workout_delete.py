@@ -29,7 +29,7 @@ def auth(user):
 def create_workout(user, name="Push", days_ago=0, activate=True):
     return Workout.objects.create(
         date=timezone.now() - timedelta(days=days_ago),
-        user_id=user,
+        user=user,
         activate=activate,
         name=name,
     )

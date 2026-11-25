@@ -30,7 +30,7 @@ def auth(user):
 
 
 def create_workout(user, name="Push"):
-    return Workout.objects.create(date=timezone.now(), user_id=user, activate=True, name=name)
+    return Workout.objects.create(date=timezone.now(), user=user, activate=True, name=name)
 
 
 @pytest.mark.django_db
@@ -123,8 +123,8 @@ def test_update_refuses_other_user_workout(client, alice, bob):
 def test_update_cannot_change_owner(client, alice, bob):
     workout = create_workout(alice)
 
-    response = patch_workout(client, alice, workout, {"user_id": bob.pk})
+    response = patch_workout(client, alice, workout, {"user": bob.pk})
 
     assert response.status_code == 200
     workout.refresh_from_db()
-    assert workout.user_id == alice
+    assert workout.user == alice

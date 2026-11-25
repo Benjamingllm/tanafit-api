@@ -30,7 +30,7 @@ class Template(models.Model):
 
 class Workout(models.Model):
     date = models.DateTimeField("Date")
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     template = models.ForeignKey(Template, null=True, blank=True, on_delete=models.CASCADE)
     activate = models.BooleanField("activated")
     name = models.CharField("name", default="workout")
