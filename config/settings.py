@@ -6,6 +6,7 @@ from pathlib import Path
 import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+MAX_INACTIVE_WORKOUTS = 3
 
 env = environ.Env(
     DEBUG=(bool, False),
